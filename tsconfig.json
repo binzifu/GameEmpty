@@ -6,7 +6,7 @@
     "sourceMap": false
   },
   "exclude": [
-    "node_modules"
-    "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"
+    "node_modules",
+    "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",
   ]
 }

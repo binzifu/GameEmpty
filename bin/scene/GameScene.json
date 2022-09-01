@@ -1,0 +1,1 @@
+{"type":"Scene","props":{"width":1334,"runtime":"runtimeui/GameUI.ts","height":750},"compId":2,"child":[{"type":"Script","props":{"runtime":"gamelayer/GameScene.ts"},"compId":3}],"loadList":[],"loadList3D":[]}
