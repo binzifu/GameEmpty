@@ -28,23 +28,40 @@ export default class GameScene extends Laya.Script {
     onAwake(): void {
        
         // this.onCreateScene();
-        // this.onCreateScene3D();
-
-        this.onCreate2DScene();
+        this.onCreateScene3D();
+		// this.onCreateLightScene();
+        // this.onCreate2DScene();
     }
 
-    //创建2d场景 添加3D模型
+	private onCreateLightScene() {
+		Laya3D.init(0, 0);
+		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+		Laya.Stat.show();
+
+		Laya.Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Laya.Handler.create(this, function (sprite: Laya.Scene3D): void {
+			var scene: Laya.Scene3D = <Laya.Scene3D>Laya.stage.addChild(sprite);
+			var camera: Laya.Camera = <Laya.Camera>scene.addChild(new Laya.Camera(0, 0.1, 100));
+			camera.transform.translate(new Laya.Vector3(0, 1, 0));
+			camera.addComponent(CameraMove);
+		}));
+	}
+
+	/** ----------------------------------------------------------------------
+	 * 								//创建2d场景 添加3D模型
+	 * ----------------------------------------------------------------------
+	*/  
     private onCreate2DScene(){
         this.initSet3D();
         this.onIn2DUI();
         //由于2D与3D混合，要涉及到屏幕适配后的像素数值转换，最好延迟几帧，保障屏幕适配值正确后再执行相关逻辑。如果是继承了引擎的Script，可以不用延迟，直接写到onStart生命周期里即可
 		Laya.timer.frameOnce(5, this, () => {
 			this.sp3ToTexture("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", this.spMonkey, 1);
-			this.spMonkey.pos(385, 50);
+			this.spMonkey.pos(385, 0);
 			this.sp3ToTexture("res/threeDimen/skinModel/dude/dude.lh", this.spRole, 2, true);
 			this.spRole.pos(385, 200);
 			this.sp3ToTexture("res/threeDimen/trail/Cube.lh", this.spTrail, 3);
-			this.spTrail.pos(100, 200);
+			this.spTrail.pos(100, 100);
 		});
 
 		//每帧循环
@@ -85,7 +102,7 @@ export default class GameScene extends Laya.Script {
 			_camera.orthographicVerticalSize = 10;
 			_camera.clearColor = new Laya.Vector4(0, 0, 0, 0);
 			//转换2D屏幕坐标系统到3D正交投影下的坐标系统
-			_camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(750, 200, 0), this.orthographicPos);
+			_camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(800, 700, 0), this.orthographicPos);
 			sp3.transform.position = this.orthographicPos;
 			//初始化精灵缩放比例
 			sp3.transform.localScale = new Laya.Vector3(1, 1, 1);
@@ -94,11 +111,13 @@ export default class GameScene extends Laya.Script {
 			_camera.removeAllLayers();
 			//添加一个摄像机层
 			_camera.addLayer(layer);
+            // console.log("sp3", sp3);
+            
 			//一定要给对应的渲染对象节点设置层与摄像机一样的层，如果不清楚是哪个节点，就写个循环，把所有节点都遍历设置一下，否则会影响显示结果
 			(<Laya.Sprite3D>sp3.getChildAt(0).getChildAt(0)).layer = layer;
 
 			//把3D画到512宽高的纹理上，再添加到摄像机的目标纹理，形成动态绑定(一个摄像机只能绑一个，要绑多个就要创建多个摄像机)
-			_camera.renderTarget = new Laya.RenderTexture(512, 512, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_24_8)
+			_camera.renderTarget = new Laya.RenderTexture(660, 512, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_24_8)
 			//再将离屏3D画到2D节点上，至此，就完成把3D画到2D的基础渲染流程
 			sp.texture = new Laya.Texture(_camera.renderTarget);
 
@@ -142,15 +161,33 @@ export default class GameScene extends Laya.Script {
 		}
 	}
 
-
     private onIn2DUI() {
         let sceneBackGround: Laya.Image = new Laya.Image("res/threeDimen/secne.jpg");
         Laya.stage.addChild(sceneBackGround);
+        sceneBackGround.addChild(this.spMonkey);
+		sceneBackGround.addChild(this.spRole);
+		sceneBackGround.addChild(this.spTrail);
     }
 
-    //直接加载3D场景
+	/** ----------------------------------------------------------------------
+	 * 				//直接加载3D场景  SceneLoad2/SceneLoad1
+	 * ----------------------------------------------------------------------
+	*/  
+    
     private onCreateScene3D(){
-        //加载场景
+		//初始化引擎
+		Laya3D.init(0, 0);
+		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+		//显示性能面板
+		Laya.Stat.show();
+
+		// this.onCreateSceneLoad1();
+		this.onCreateSceneLoad2();
+    }
+
+	private onCreateSceneLoad1() {
+		//加载场景
 		Laya.Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D): void {
 			(<Laya.Scene3D>Laya.stage.addChild(scene));
             console.log("scene", scene);
@@ -171,9 +208,72 @@ export default class GameScene extends Laya.Script {
 			//设置灯光环境色
 			//scene.ambientColor = new Laya.Vector3(2.5, 0, 0);
 		}));
-    }
+	}
 
-    //创建3D场景  在加载天空盒子
+	private onCreateSceneLoad2() {
+		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D): void {
+			Laya.stage.addChild(scene);
+			//开启雾化效果
+			scene.enableFog = true;
+			//设置雾化的颜色
+			scene.fogColor = new Laya.Vector3(0, 0, 0.6);
+			//设置雾化的起始位置，相对于相机的距离
+			scene.fogStart = 10;
+			//设置雾化最浓处的距离。
+			scene.fogRange = 40;
+			//设置场景环境光
+			scene.ambientColor = new Laya.Vector3(0.6, 0, 0);
+
+			//添加相机
+			var camera: Laya.Camera = new Laya.Camera();
+			scene.addChild(camera);
+			//调整相机的位置
+			camera.transform.translate(new Laya.Vector3(10, 15, -25));
+			camera.transform.rotate(new Laya.Vector3(-20, 170, 0), false, false);
+			//设置相机横纵比
+			camera.aspectRatio = 0;
+			//设置相机近距裁剪
+			camera.nearPlane = 0.1;
+			//设置相机远距裁剪
+			camera.farPlane = 1000;
+			//相机设置清楚标记
+			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+			//设置摄像机视野范围（角度）
+			camera.fieldOfView = 60;
+			//设置背景颜色
+			//camera.clearColor = new Vector4(0,0,0.6,1);    
+			//加入摄像机移动控制脚本
+			camera.addComponent(CameraMove);
+
+			//加载相机天空盒材质
+			Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat: Laya.Material): void {
+				var skyRenderer: Laya.SkyRenderer = camera.skyRenderer;
+				skyRenderer.mesh = Laya.SkyBox.instance;
+				skyRenderer.material = mat;
+			}));
+
+			//创建方向光
+			var light: Laya.DirectionLight = (<Laya.DirectionLight>scene.addChild(new Laya.DirectionLight()));
+			//移动灯光位置
+			light.transform.translate(new Laya.Vector3(0, 2, 5));
+			//调整灯光方向
+			var mat: Laya.Matrix4x4 = light.transform.worldMatrix;
+			mat.setForward(new Laya.Vector3(0, -5, 1));
+			light.transform.worldMatrix = mat;
+			//设置灯光漫反射颜色
+			light.color = new Laya.Vector3(0.3, 0.3, 0.3);
+
+			//激活场景中的两个子节点
+			((<Laya.MeshSprite3D>scene.getChildByName('Scenes').getChildByName('HeightMap'))).active = false;
+			((<Laya.MeshSprite3D>scene.getChildByName('Scenes').getChildByName('Area'))).active = false;
+		}));
+	}
+	
+	/** ----------------------------------------------------------------------
+	 * 								//创建3D场景  在加载天空盒子
+	 * ----------------------------------------------------------------------
+	*/  
+    
     private onCreateScene() {
         console.log("Hello Laya");
         var scene: Laya.Scene3D = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;

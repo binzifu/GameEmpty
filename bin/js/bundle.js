@@ -106,18 +106,30 @@
             this.rotationD = new Laya.Vector3(0, -90, 0);
         }
         onAwake() {
-            this.onCreate2DScene();
+            this.onCreateScene3D();
+        }
+        onCreateLightScene() {
+            Laya3D.init(0, 0);
+            Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+            Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+            Laya.Stat.show();
+            Laya.Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Laya.Handler.create(this, function (sprite) {
+                var scene = Laya.stage.addChild(sprite);
+                var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
+                camera.transform.translate(new Laya.Vector3(0, 1, 0));
+                camera.addComponent(CameraMove);
+            }));
         }
         onCreate2DScene() {
             this.initSet3D();
             this.onIn2DUI();
             Laya.timer.frameOnce(5, this, () => {
                 this.sp3ToTexture("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", this.spMonkey, 1);
-                this.spMonkey.pos(385, 50);
+                this.spMonkey.pos(385, 0);
                 this.sp3ToTexture("res/threeDimen/skinModel/dude/dude.lh", this.spRole, 2, true);
                 this.spRole.pos(385, 200);
                 this.sp3ToTexture("res/threeDimen/trail/Cube.lh", this.spTrail, 3);
-                this.spTrail.pos(100, 200);
+                this.spTrail.pos(100, 100);
             });
             Laya.timer.frameLoop(1, this, this.onKeyTDown);
         }
@@ -139,13 +151,13 @@
                 _camera.orthographic = true;
                 _camera.orthographicVerticalSize = 10;
                 _camera.clearColor = new Laya.Vector4(0, 0, 0, 0);
-                _camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(750, 200, 0), this.orthographicPos);
+                _camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(800, 700, 0), this.orthographicPos);
                 sp3.transform.position = this.orthographicPos;
                 sp3.transform.localScale = new Laya.Vector3(1, 1, 1);
                 _camera.removeAllLayers();
                 _camera.addLayer(layer);
                 sp3.getChildAt(0).getChildAt(0).layer = layer;
-                _camera.renderTarget = new Laya.RenderTexture(512, 512, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_24_8);
+                _camera.renderTarget = new Laya.RenderTexture(660, 512, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_24_8);
                 sp.texture = new Laya.Texture(_camera.renderTarget);
                 isRole && (this.sp3Role = sp3);
             }));
@@ -185,8 +197,18 @@
         onIn2DUI() {
             let sceneBackGround = new Laya.Image("res/threeDimen/secne.jpg");
             Laya.stage.addChild(sceneBackGround);
+            sceneBackGround.addChild(this.spMonkey);
+            sceneBackGround.addChild(this.spRole);
+            sceneBackGround.addChild(this.spTrail);
         }
         onCreateScene3D() {
+            Laya3D.init(0, 0);
+            Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+            Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+            Laya.Stat.show();
+            this.onCreateSceneLoad2();
+        }
+        onCreateSceneLoad1() {
             Laya.Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Laya.Handler.create(this, function (scene) {
                 Laya.stage.addChild(scene);
                 console.log("scene", scene);
@@ -196,6 +218,39 @@
                 camera.fieldOfView = 60;
                 camera.clearColor = new Laya.Vector4(0, 0, 0.6, 1);
                 camera.addComponent(CameraMove);
+            }));
+        }
+        onCreateSceneLoad2() {
+            Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function (scene) {
+                Laya.stage.addChild(scene);
+                scene.enableFog = true;
+                scene.fogColor = new Laya.Vector3(0, 0, 0.6);
+                scene.fogStart = 10;
+                scene.fogRange = 40;
+                scene.ambientColor = new Laya.Vector3(0.6, 0, 0);
+                var camera = new Laya.Camera();
+                scene.addChild(camera);
+                camera.transform.translate(new Laya.Vector3(10, 15, -25));
+                camera.transform.rotate(new Laya.Vector3(-20, 170, 0), false, false);
+                camera.aspectRatio = 0;
+                camera.nearPlane = 0.1;
+                camera.farPlane = 1000;
+                camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+                camera.fieldOfView = 60;
+                camera.addComponent(CameraMove);
+                Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat) {
+                    var skyRenderer = camera.skyRenderer;
+                    skyRenderer.mesh = Laya.SkyBox.instance;
+                    skyRenderer.material = mat;
+                }));
+                var light = scene.addChild(new Laya.DirectionLight());
+                light.transform.translate(new Laya.Vector3(0, 2, 5));
+                var mat = light.transform.worldMatrix;
+                mat.setForward(new Laya.Vector3(0, -5, 1));
+                light.transform.worldMatrix = mat;
+                light.color = new Laya.Vector3(0.3, 0.3, 0.3);
+                scene.getChildByName('Scenes').getChildByName('HeightMap').active = false;
+                scene.getChildByName('Scenes').getChildByName('Area').active = false;
             }));
         }
         onCreateScene() {
