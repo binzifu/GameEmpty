@@ -139,7 +139,7 @@
                 _camera.orthographic = true;
                 _camera.orthographicVerticalSize = 10;
                 _camera.clearColor = new Laya.Vector4(0, 0, 0, 0);
-                _camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(800, 700, 0), this.orthographicPos);
+                _camera.convertScreenCoordToOrthographicCoord(new Laya.Vector3(750, 200, 0), this.orthographicPos);
                 sp3.transform.position = this.orthographicPos;
                 sp3.transform.localScale = new Laya.Vector3(1, 1, 1);
                 _camera.removeAllLayers();
