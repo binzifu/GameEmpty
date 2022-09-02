@@ -31,8 +31,35 @@ export default class GameScene extends Laya.Script {
         // this.onCreateScene3D();
 		// this.onCreateLightScene();
         // this.onCreate2DScene();
+		// this.onLoadBurningGround();
+		// this.DamagedHelmetModelShow();
     }
 
+	/** ----------------------------------------------------------------------
+	 * 						//加载熔岩 模型 / EternalLight
+	 * ----------------------------------------------------------------------
+	*/ 
+	private onLoadBurningGround() {
+		this.m_scene = <Laya.Scene3D>Laya.stage.addChild(new Laya.Scene3D())
+
+		var camera: Laya.Camera = <Laya.Camera>this.m_scene.addChild(new Laya.Camera(0, 0.1, 100));
+		camera.transform.translate(new Laya.Vector3(0, 2, 4));
+		camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
+		camera.clearFlag = Laya.CameraClearFlags.SolidColor;
+		camera.clearColor = new Laya.Vector4(0, 0, 0, 1);
+
+		// Laya.Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh", Laya.Handler.create(this, function (sprite3D: Laya.Sprite3D) {
+		// 	<Laya.Sprite3D>this.m_scene.addChild(sprite3D);
+		// }.bind(this)))
+
+		Laya.Sprite3D.load("res/threeDimen/particle/ETF_Eternal_Light.lh", Laya.Handler.create(this, function (sprite: Laya.Sprite3D): void {
+			(<Laya.Sprite3D>this.m_scene.addChild(sprite));
+		}.bind(this)))
+	}
+	/** ----------------------------------------------------------------------
+	 * 								//创建光场景
+	 * ----------------------------------------------------------------------
+	*/  
 	private onCreateLightScene() {
 		Laya3D.init(0, 0);
 		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -44,7 +71,7 @@ export default class GameScene extends Laya.Script {
 			var camera: Laya.Camera = <Laya.Camera>scene.addChild(new Laya.Camera(0, 0.1, 100));
 			camera.transform.translate(new Laya.Vector3(0, 1, 0));
 			camera.addComponent(CameraMove);
-		}));
+		}.bind(this)));
 	}
 
 	/** ----------------------------------------------------------------------
@@ -182,8 +209,8 @@ export default class GameScene extends Laya.Script {
 		//显示性能面板
 		Laya.Stat.show();
 
-		// this.onCreateSceneLoad1();
-		this.onCreateSceneLoad2();
+		this.onCreateSceneLoad1();
+		// this.onCreateSceneLoad2();
     }
 
 	private onCreateSceneLoad1() {
@@ -213,6 +240,8 @@ export default class GameScene extends Laya.Script {
 	private onCreateSceneLoad2() {
 		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D): void {
 			Laya.stage.addChild(scene);
+			console.log("scene", scene);
+			
 			//开启雾化效果
 			scene.enableFog = true;
 			//设置雾化的颜色
@@ -246,7 +275,7 @@ export default class GameScene extends Laya.Script {
 			camera.addComponent(CameraMove);
 
 			//加载相机天空盒材质
-			Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat: Laya.Material): void {
+			Laya.Material.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat: Laya.Material): void {
 				var skyRenderer: Laya.SkyRenderer = camera.skyRenderer;
 				skyRenderer.mesh = Laya.SkyBox.instance;
 				skyRenderer.material = mat;
@@ -343,4 +372,77 @@ export default class GameScene extends Laya.Script {
 
     onDisable(): void {
     }
+
+	/** ----------------------------------------------------------------------
+	 * 	//CerberusModelShow	//DamagedHelmetModelShow //GhostModelShow
+	 * ----------------------------------------------------------------------
+	*/  
+
+	private DamagedHelmetModelShow() {
+		Laya3D.init(0, 0);
+		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+
+		//-----------------------------------------------------
+		//DamagedHelmetModelShow
+		//-----------------------------------------------------
+		// Laya.Scene3D.load("res/threeDimen/scene/LayaScene_DamagedHelmetScene/Conventional/DamagedHelmetScene.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D) {
+		// 	Laya.stage.addChild(scene);
+		// 	var model: Laya.MeshSprite3D = <Laya.MeshSprite3D>scene.getChildAt(1).getChildAt(0);
+		// 	var rorarionspript: RotationScript = model.addComponent(RotationScript);
+		// 	rorarionspript.model = model;
+		// 	console.log("scene", scene);
+		// }));
+
+		//-----------------------------------------------------
+		//CerberusModelShow
+		//-----------------------------------------------------
+		// Laya.Scene3D.load("res/threeDimen/scene/LayaScene_CerberusScene/Conventional/CerberusScene.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D) {
+		// 	Laya.stage.addChild(scene);
+		// 	scene.ambientMode = Laya.AmbientMode.SphericalHarmonics;
+		// 	var model: Laya.Sprite3D = <Laya.Sprite3D>scene.getChildByName("Cerberus_LP");
+		// 	var rorarionspript: RotationScript = model.addComponent(RotationScript);
+		// 	rorarionspript.model = model;
+		// 	console.log("scene", scene);
+		// }));
+
+		//-----------------------------------------------------
+		//GhostModelShow
+		//-----------------------------------------------------
+		Laya.Scene3D.load("res/threeDimen/scene/PBRScene/Demo.ls", Laya.Handler.create(this, function (scene: Laya.Scene3D) {
+			Laya.stage.addChild(scene);
+			var camera: Laya.Camera = <Laya.Camera>scene.getChildByName("Camera");
+			camera.addComponent(CameraMove);
+		}));
+	}
+}
+
+class RotationScript extends Laya.Script3D {
+	private _mouseDown: boolean = false;
+	private lastMouseX: number;
+	private _rotate: Laya.Vector3 = new Laya.Vector3();
+	private _autoRotateSpeed: Laya.Vector3 = new Laya.Vector3(0, 0.25, 0);
+	model: Laya.Sprite3D;
+	constructor(){
+		super();
+
+		Laya.stage.on(Laya.Event.MOUSE_DOWN, this, function () {
+			this._mouseDown = true;
+			this.lastMouseX = Laya.stage.mouseX;
+		});
+		Laya.stage.on(Laya.Event.MOUSE_UP, this, function () {
+			this._mouseDown = false;
+		});
+	}
+
+	onUpdate() :void {
+		if (this._mouseDown) {
+			var deltax: number = Laya.MouseManager.instance.mouseX - this.lastMouseX;
+			this._rotate.y = deltax * 0.2;
+			this.model.transform.rotate(this._rotate, false, false);
+			this.lastMouseX = Laya.MouseManager.instance.mouseX;
+		}else{
+			this.model.transform.rotate(this._autoRotateSpeed, false, false);
+		}
+	}
 }

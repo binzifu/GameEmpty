@@ -19,15 +19,15 @@ export class CameraMove extends Laya.Script3D {
 
     onAwake(): void {
         this.camera = <Laya.Camera>this.owner;
-        Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.Clickmouse);
+        // Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.Clickmouse);
         Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseRDown);
         Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseRUp);
     }
 
-    private Clickmouse() {
-        console.log("======");
+    // private Clickmouse() {
+    //     console.log("======");
         
-    }
+    // }
 
     onDestroy(): void {
         Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseRDown);

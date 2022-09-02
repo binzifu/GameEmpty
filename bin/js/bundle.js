@@ -26,12 +26,8 @@
         }
         onAwake() {
             this.camera = this.owner;
-            Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.Clickmouse);
             Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseRDown);
             Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseRUp);
-        }
-        Clickmouse() {
-            console.log("======");
         }
         onDestroy() {
             Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseRDown);
@@ -106,7 +102,18 @@
             this.rotationD = new Laya.Vector3(0, -90, 0);
         }
         onAwake() {
-            this.onCreateScene3D();
+            this.DamagedHelmetModelShow();
+        }
+        onLoadBurningGround() {
+            this.m_scene = Laya.stage.addChild(new Laya.Scene3D());
+            var camera = this.m_scene.addChild(new Laya.Camera(0, 0.1, 100));
+            camera.transform.translate(new Laya.Vector3(0, 2, 4));
+            camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
+            camera.clearFlag = Laya.CameraClearFlags.SolidColor;
+            camera.clearColor = new Laya.Vector4(0, 0, 0, 1);
+            Laya.Sprite3D.load("res/threeDimen/particle/ETF_Eternal_Light.lh", Laya.Handler.create(this, function (sprite) {
+                this.m_scene.addChild(sprite);
+            }.bind(this)));
         }
         onCreateLightScene() {
             Laya3D.init(0, 0);
@@ -118,7 +125,7 @@
                 var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
                 camera.transform.translate(new Laya.Vector3(0, 1, 0));
                 camera.addComponent(CameraMove);
-            }));
+            }.bind(this)));
         }
         onCreate2DScene() {
             this.initSet3D();
@@ -206,7 +213,7 @@
             Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
             Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
             Laya.Stat.show();
-            this.onCreateSceneLoad2();
+            this.onCreateSceneLoad1();
         }
         onCreateSceneLoad1() {
             Laya.Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Laya.Handler.create(this, function (scene) {
@@ -223,6 +230,7 @@
         onCreateSceneLoad2() {
             Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function (scene) {
                 Laya.stage.addChild(scene);
+                console.log("scene", scene);
                 scene.enableFog = true;
                 scene.fogColor = new Laya.Vector3(0, 0, 0.6);
                 scene.fogStart = 10;
@@ -238,7 +246,7 @@
                 camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
                 camera.fieldOfView = 60;
                 camera.addComponent(CameraMove);
-                Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat) {
+                Laya.Material.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, function (mat) {
                     var skyRenderer = camera.skyRenderer;
                     skyRenderer.mesh = Laya.SkyBox.instance;
                     skyRenderer.material = mat;
@@ -301,6 +309,42 @@
         onEnable() {
         }
         onDisable() {
+        }
+        DamagedHelmetModelShow() {
+            Laya3D.init(0, 0);
+            Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+            Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+            Laya.Scene3D.load("res/threeDimen/scene/PBRScene/Demo.ls", Laya.Handler.create(this, function (scene) {
+                Laya.stage.addChild(scene);
+                var camera = scene.getChildByName("Camera");
+                camera.addComponent(CameraMove);
+            }));
+        }
+    }
+    class RotationScript extends Laya.Script3D {
+        constructor() {
+            super();
+            this._mouseDown = false;
+            this._rotate = new Laya.Vector3();
+            this._autoRotateSpeed = new Laya.Vector3(0, 0.25, 0);
+            Laya.stage.on(Laya.Event.MOUSE_DOWN, this, function () {
+                this._mouseDown = true;
+                this.lastMouseX = Laya.stage.mouseX;
+            });
+            Laya.stage.on(Laya.Event.MOUSE_UP, this, function () {
+                this._mouseDown = false;
+            });
+        }
+        onUpdate() {
+            if (this._mouseDown) {
+                var deltax = Laya.MouseManager.instance.mouseX - this.lastMouseX;
+                this._rotate.y = deltax * 0.2;
+                this.model.transform.rotate(this._rotate, false, false);
+                this.lastMouseX = Laya.MouseManager.instance.mouseX;
+            }
+            else {
+                this.model.transform.rotate(this._autoRotateSpeed, false, false);
+            }
         }
     }
 
