@@ -29,7 +29,7 @@ export default class GameScene extends Laya.Script {
        
         // this.onCreateScene();
         // this.onCreateScene3D();
-		this.onCreateLightScene();
+		// this.onCreateLightScene();
         // this.onCreate2DScene();
     }
 
