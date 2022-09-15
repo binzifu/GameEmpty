@@ -38,18 +38,9 @@ export default class GameScene extends Laya.Script {
 
 	//鼠标所在地放大  原理遮罩
 	private onMousePoingImage() {
-		Laya3D.init(0, 0);
-        Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-        // Laya.Stat.show();
-
-		this.m_scene = <Laya.Scene3D>Laya.stage.addChild(new Laya.Scene3D());
-
-		var camera: Laya.Camera = <Laya.Camera>this.m_scene.addChild(new Laya.Camera(0, 0.1, 100));
-		camera.transform.translate(new Laya.Vector3(0, 2, 4));
-		camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
-		camera.clearFlag = Laya.CameraClearFlags.SolidColor;
-		camera.clearColor = new Laya.Vector4(0, 0, 0, 1);
+		Laya.init(1134, 640, Laya.WebGL);
+        Laya.stage.scaleMode = Laya.Stage.SCALE_SHOWALL;
+        Laya.stage.bgColor = "#232628";
 
 		Laya.loader.load("res/bg.jpg", Laya.Handler.create(this, this.setSpImage));
 	}
@@ -68,7 +59,7 @@ export default class GameScene extends Laya.Script {
 		// this._bg.texture = spture;
 		Laya.stage.addChild(this._bg);
 
-		this.bg2 = new Laya.Sprite()
+		this.bg2 = new Laya.Sprite();
 		// spture = <Laya.Texture>Laya.loader.getRes("res/bg.jpg");
 		// this.bg2.texture = spture;
 		this.bg2.loadImage("res/bg.jpg", null);
@@ -91,7 +82,7 @@ export default class GameScene extends Laya.Script {
 		this.maskSp.x = Laya.stage.mouseX;
 		this.maskSp.y = Laya.stage.mouseY;
 	}
-
+ 
 	/** ----------------------------------------------------------------------
 	 * 						//加载熔岩 模型 / EternalLight
 	 * ----------------------------------------------------------------------

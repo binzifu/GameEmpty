@@ -105,15 +105,9 @@
             this.onMousePoingImage();
         }
         onMousePoingImage() {
-            Laya3D.init(0, 0);
-            Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-            Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-            this.m_scene = Laya.stage.addChild(new Laya.Scene3D());
-            var camera = this.m_scene.addChild(new Laya.Camera(0, 0.1, 100));
-            camera.transform.translate(new Laya.Vector3(0, 2, 4));
-            camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
-            camera.clearFlag = Laya.CameraClearFlags.SolidColor;
-            camera.clearColor = new Laya.Vector4(0, 0, 0, 1);
+            Laya.init(1134, 640, Laya.WebGL);
+            Laya.stage.scaleMode = Laya.Stage.SCALE_SHOWALL;
+            Laya.stage.bgColor = "#232628";
             Laya.loader.load("res/bg.jpg", Laya.Handler.create(this, this.setSpImage));
         }
         setSpImage() {
@@ -124,7 +118,7 @@
             this.bg2 = new Laya.Sprite();
             this.bg2.loadImage("res/bg.jpg", null);
             Laya.stage.addChild(this.bg2);
-            this.bg2.scale(3, 3);
+            this.bg2.scale(4, 4);
             this.maskSp = new Laya.Sprite();
             this.maskSp.loadImage("res/mask.png");
             this.maskSp.pivot(50, 50);
@@ -389,10 +383,10 @@
             reg("gamelayer/GameScene.ts", GameScene);
         }
     }
-    GameConfig.width = 640;
-    GameConfig.height = 1136;
+    GameConfig.width = 1024;
+    GameConfig.height = 768;
     GameConfig.scaleMode = "fixedwidth";
-    GameConfig.screenMode = "horizontal";
+    GameConfig.screenMode = "none";
     GameConfig.alignV = "top";
     GameConfig.alignH = "left";
     GameConfig.startScene = "scene/GameScene.scene";

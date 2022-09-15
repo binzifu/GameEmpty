@@ -5,10 +5,10 @@ import GameScene from "./gamelayer/GameScene"
 * 游戏初始化配置;
 */
 export default class GameConfig{
-    static width:number=640;
-    static height:number=1136;
+    static width:number=1024;
+    static height:number=768;
     static scaleMode:string="fixedwidth";
-    static screenMode:string="horizontal";
+    static screenMode:string="none";
     static alignV:string="top";
     static alignH:string="left";
     static startScene:any="scene/GameScene.scene";
